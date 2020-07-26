@@ -78,13 +78,19 @@ class Option:
 
         return {key: value for key, value in json.items() if value != None}
 
+    @classmethod
+    def from_json(cls, json) -> "Option":
+        return Option(**json)
+
 
 class Question:
     """
     Class representing elector API question object
     """
 
-    def __init__(self, question_text: str, options: [Option], question_number: str = None):
+    def __init__(
+        self, question_text: str, options: [Option], question_number: str = None
+    ):
         self.__question_text = question_text
         self.__options = options
         self.__question_number = question_number
@@ -101,6 +107,17 @@ class Question:
 
         return {key: value for key, value in json.items() if value != None}
 
+    @classmethod
+    def from_json(cls, json) -> "Question":
+        options = [Option.from_json(option) for option in json.get("options")]
+        return Question(json.get("question_text"), options, json.get("question_number"))
+
+
+class BallotNotFoundException(Exception):
+    """Ballot Not Found Exception"""
+
+    pass
+
 
 class Ballot:
     URL = "localhost:8000"
@@ -112,6 +129,32 @@ class Ballot:
         self.__voter_list = voter_list
         self.__id = kwargs.get("id")
         self.__date_created = kwargs.get("date_created")
+
+    def send_create(self) -> bool:
+        """
+        Sends ballot create request to elector api.
+        """
+        response = requests.post(f"http://{self.URL}/ballot/api/create/", json=self.json)
+        if response.status_code == 201:
+            json = response.json()
+            self.__id = json.get("id")
+            self.__date_created = json.get("date_created")
+            self.__questions = [
+                Question.from_json(question) for question in json.get("questions")
+            ]
+            return True
+        else:
+            return False
+
+    @classmethod
+    def fetch_ballot_by_id(cls, id: int) -> "Ballot":
+        response = requests.get(f"http://{cls.URL}/ballot/api/{id}/")
+        if response.status_code == 200:
+            return Ballot.from_json(response.json())
+        elif response.status_code == 404:
+            raise BallotNotFoundException
+        else:
+            raise Exception
 
     @property
     def json(self) -> dict:
@@ -125,3 +168,13 @@ class Ballot:
         }
 
         return {key: value for key, value in json.items() if value != None}
+
+    @classmethod
+    def from_json(cls, json) -> "Ballot":
+        questions = [Question.from_json(question) for question in json.get("questions")]
+        return Ballot(
+            json.get("title"), 
+            json.get("deadline"), 
+            questions, 
+            json.get("voter_list")
+        )
