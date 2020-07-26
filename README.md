@@ -3,10 +3,7 @@
 ## Python Library to make using Elector API easier.
 
 
-## Install
-----
+## Install 
+```
 $ pip install git+https://github.com/Open-Sorcery/elector_lib.git
-----
-
-
-
+```
