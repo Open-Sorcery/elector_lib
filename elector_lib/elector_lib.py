@@ -2,13 +2,13 @@ import requests
 
 
 def ballot_create():
-    pass
+    print('ballot_create')
 
 def ballot_delete():
-    pass
+    print('ballot_delete')
 
 def ballot_detail():
-    pass
+    print('ballot_detail')
 
 def ballot_vote():
-    pass
+    print('ballot_vote')
