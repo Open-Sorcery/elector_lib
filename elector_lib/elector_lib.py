@@ -51,3 +51,48 @@ class Vote():
         """
         if not self._voted: raise HaveNotVotedYetException
         return self._data
+
+class Option:
+    """
+    Class representing elector API option object
+    """
+
+    def __init__(self, option_text: str, option_number: int = None, votes: int = None):
+        self.__option_text = option_text
+        self.__option_number = option_number
+        self.__votes = votes
+
+    @property
+    def json(self):
+        """Returns dict (json) representing option"""
+        json = {
+            "option_number": self.__option_number,
+            "option_text": self.__option_text,
+            "votes": self.__votes,
+        }
+
+        return {key: value for key, value in json.items() if value != None}
+
+
+class Question:
+    """
+    Class representing elector API question object
+    """
+
+    def __init__(self, question_text: str, options: [Option], question_number=None):
+        self.__question_text = question_text
+        self.__options = options
+        self.__question_number = question_number
+
+    @property
+    def json(self):
+        """Returns dict (json) representing question"""
+
+        json = {
+            "question_number": self.__question_number,
+            "question_text": self.__question_text,
+            "options": [option.json for option in self.__options],
+        }
+
+        return {key: value for key, value in json.items() if value != None}
+
