@@ -1,7 +1,5 @@
 # elector_lib
-
-## Python Library to make using Elector API easier.
-
+Python Library that makes using [Elector API](https://github.com/Open-Sorcery/elector) easier.
 
 ## Install 
 ```
